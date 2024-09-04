@@ -1854,7 +1854,7 @@ if test -z "$_target" ; then
       vax) host_arch=vax ;;
       xtensa*) host_arch=xtensa ;;
       loongarch64) host_arch=loongarch64 ;;
-      *) host_arch=UNKNOWN ;;
+      *) host_arch=generic ;;
   esac
   }
   set_host_arch "$(uname -m 2>&1)"
