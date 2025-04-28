@@ -2435,6 +2435,9 @@ int reinit_video_chain(void)
 
 err_out:
     uninit_player(INITIALIZED_VCODEC);
+    // ensure we do not try to play video even if we
+    // failed before vfilter creation.
+    mpctx->sh_video = NULL;
     return 0;
 }
 
