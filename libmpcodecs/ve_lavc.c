@@ -152,7 +152,7 @@ static int lavc_param_video_global_header= 0;
 static int lavc_param_mv0_threshold = 256;
 static int lavc_param_refs = 1;
 static int lavc_param_b_sensitivity = 40;
-static int lavc_param_level = FF_LEVEL_UNKNOWN;
+static int lavc_param_level = AV_LEVEL_UNKNOWN;
 
 char *lavc_param_acodec = "mp2";
 int lavc_param_atag = 0;
@@ -722,12 +722,12 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double
 
     if(lavc_param_interlaced_dct){
         if((mpi->fields & MP_IMGFIELD_ORDERED) && (mpi->fields & MP_IMGFIELD_INTERLACED))
-            pic->top_field_first= !!(mpi->fields & MP_IMGFIELD_TOP_FIRST);
+            pic->flags |= (mpi->fields & MP_IMGFIELD_TOP_FIRST) ? AV_FRAME_FLAG_TOP_FIELD_FIRST : 0;
         else
-            pic->top_field_first= 1;
+            pic->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
 
         if(lavc_param_top!=-1)
-            pic->top_field_first= lavc_param_top;
+            pic->flags= (pic->flags & ~AV_FRAME_FLAG_TOP_FIELD_FIRST) | lavc_param_top ? AV_FRAME_FLAG_TOP_FIELD_FIRST : 0;
     }
 
     return encode_frame(vf, pic, pts) >= 0;
@@ -851,9 +851,6 @@ static void uninit(struct vf_instance *vf){
 
     av_freep(&lavc_venc_context->intra_matrix);
     av_freep(&lavc_venc_context->inter_matrix);
-
-    if (lavc_venc_context->codec)
-        avcodec_close(lavc_venc_context);
 
     if(stats_file) fclose(stats_file);
 
